@@ -15,14 +15,15 @@ let centered_levels = [
     ],
     time: 2,
     radius: 20,
+    guide: true,
   },
   {
     polygon: [
       [-100, -30],
       [-150, 0],
       [-100, 30],
-      [100, 25],
-      [100, -25],
+      [100, 22],
+      [100, -22],
     ],
     path: [
       [-100, 0],
@@ -120,5 +121,6 @@ export let levels = centered_levels.map((level) => {
     }),
     time: level.time,
     radius: level.radius,
+    guide: level.guide,
   };
 });

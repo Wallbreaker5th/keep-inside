@@ -176,7 +176,9 @@ export default class InsideScene extends Phaser.Scene {
     this.objects.polygon = this.styledPolygon(new_polygon);
   }
 
-  preload() {}
+  preload() {
+    this.load.image("guide", "guide.png");
+  }
 
   init_with_level_data(data: any) {
     // remove old objects
@@ -191,6 +193,7 @@ export default class InsideScene extends Phaser.Scene {
         }
       }
     }
+
     if (data != null) {
       this.level_data = data;
     }
@@ -233,6 +236,16 @@ export default class InsideScene extends Phaser.Scene {
 
     this.objects = {};
 
+    if (this.level_data.guide) {
+      console.log("guide");
+      this.objects.guide = this.add.image(
+        850,
+        400,
+        "guide"
+      );
+      this.objects.guide.setOrigin(0.5, 0.5);
+      this.objects.guide.setScale(0.4);
+    }
     this.objects.path = this.add.polygon(
       0,
       0,
@@ -352,7 +365,6 @@ export default class InsideScene extends Phaser.Scene {
   }
 
   checkLose() {
-    // if self-intersect
     for (let i = 0; i < this.objects.dots.length; i++) {
       for (let j = i + 2; j < this.objects.dots.length; j++) {
         if (
@@ -369,7 +381,6 @@ export default class InsideScene extends Phaser.Scene {
       }
     }
 
-    // if outside
     for (let i = 0; i < this.objects.dots.length; i++) {
       let d = distance(
         this.objects.dots[i].getCenter(),
@@ -378,7 +389,7 @@ export default class InsideScene extends Phaser.Scene {
       );
       this.min_distance = Math.min(this.min_distance, d);
       if (d < this.level_data.radius) {
-        this.endGame(false, "The circle is outside the polygon.");
+        this.endGame(false, "The circle touches the polygon.");
         return;
       }
     }
