@@ -54,7 +54,6 @@ export default class InsideScene extends Phaser.Scene {
   }
 
   onPointerDown(pointer: Phaser.Input.Pointer) {
-    console.log("pointer down", this.has_begun, this.has_ended);
     if (!this.has_begun) {
       this.has_begun = true;
       this.is_running = true;
@@ -198,7 +197,9 @@ export default class InsideScene extends Phaser.Scene {
       this.level_data = data;
     }
     this.area = new Phaser.Geom.Polygon(
-      this.level_data.polygon.map((p: number[]) => new Phaser.Geom.Point(p[0], p[1]))
+      this.level_data.polygon.map(
+        (p: number[]) => new Phaser.Geom.Point(p[0], p[1])
+      )
     ).calculateArea();
     this.is_running = false;
     this.has_begun = false;
@@ -237,15 +238,11 @@ export default class InsideScene extends Phaser.Scene {
     this.objects = {};
 
     if (this.level_data.guide) {
-      console.log("guide");
-      this.objects.guide = this.add.image(
-        850,
-        400,
-        "guide"
-      );
+      this.objects.guide = this.add.image(850, 400, "guide");
       this.objects.guide.setOrigin(0.5, 0.5);
       this.objects.guide.setScale(0.4);
     }
+
     this.objects.path = this.add.polygon(
       0,
       0,
@@ -257,6 +254,18 @@ export default class InsideScene extends Phaser.Scene {
     this.objects.path.setStrokeStyle(2, colors.path_stroke, 1);
     this.objects.path.setClosePath(false);
 
+    this.objects.path_dots = [];
+    for (let i = 0; i < this.level_data.path.length; i++) {
+      let dot = this.add.circle(
+        this.level_data.path[i][0],
+        this.level_data.path[i][1],
+        4,
+        colors.path_stroke,
+        1
+      );
+      this.objects.path_dots.push(dot);
+    }
+
     this.objects.circle = this.add.circle(
       this.level_data.path[0][0],
       this.level_data.path[0][1],
@@ -264,7 +273,7 @@ export default class InsideScene extends Phaser.Scene {
       colors.circle_fill,
       1
     );
-    this.objects.circle.setStrokeStyle(2, colors.circle_stroke, 1);
+    this.objects.circle.setStrokeStyle(4, colors.circle_stroke, 1);
 
     this.objects.polygon = this.styledPolygon(this.level_data.polygon);
 
@@ -315,12 +324,13 @@ export default class InsideScene extends Phaser.Scene {
 
     this.objects.text = this.add.text(
       this.cameras.main.width / 2,
-      this.cameras.main.height / 2,
+      this.cameras.main.height / 2 - 32,
       this.is_win ? "You win!" : "You lose!",
       {
         fontSize: "64pt",
         color: "#ffffff",
         fontStyle: "bold",
+        fontFamily: "Novem",
       }
     );
     this.objects.text.setOrigin(0.5, 0.5);
@@ -333,7 +343,6 @@ export default class InsideScene extends Phaser.Scene {
         fontSize: "32pt",
         color: "#ffffff",
         align: "center",
-        fontStyle: "bold",
       }
     );
     this.objects.text_end_info.setOrigin(0.5, 0.5);

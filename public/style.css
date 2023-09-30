@@ -1,6 +1,10 @@
+@font-face {
+  font-family: Novem;
+  src: url(/Novem-gx193.ttf);
+}
 
 .levels-button {
-  background-color: #4CAF50; /* Green */
+  background-color: #2E6B5E; /* Green */
   border: none;
   color: white;
   padding: 10px 20px;
@@ -8,5 +12,10 @@
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 16px;
+  font: 20px Novem;
+}
+
+body {
+  background-color: #8be2ff;
+  font: 20px Novem;
 }
