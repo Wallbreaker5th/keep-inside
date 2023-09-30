@@ -177,6 +177,9 @@ export default class InsideScene extends Phaser.Scene {
 
   preload() {
     this.load.image("guide", "guide.png");
+    this.load.image("ball/smile", "ball/smile.png");
+    this.load.image("ball/worry", "ball/worry.png");
+    this.load.image("ball/panic", "ball/panic.png");
   }
 
   init_with_level_data(data: any) {
@@ -266,14 +269,14 @@ export default class InsideScene extends Phaser.Scene {
       this.objects.path_dots.push(dot);
     }
 
-    this.objects.circle = this.add.circle(
+    this.objects.circle = this.add.image(
       this.level_data.path[0][0],
       this.level_data.path[0][1],
-      this.level_data.radius,
-      colors.circle_fill,
-      1
+      "ball/smile"
     );
-    this.objects.circle.setStrokeStyle(4, colors.circle_stroke, 1);
+    this.objects.circle.setOrigin(0.5, 0.5);
+    let circle_scale = this.level_data.radius / (this.objects.circle.width / 2);
+    this.objects.circle.setScale(circle_scale);
 
     this.objects.polygon = this.styledPolygon(this.level_data.polygon);
 
@@ -373,6 +376,17 @@ export default class InsideScene extends Phaser.Scene {
     }
   }
 
+  updateCircleImage(distance: number) {
+    let ratio = (distance - this.level_data.radius) / this.level_data.radius;
+    if (ratio < 0.3) {
+      this.objects.circle.setTexture("ball/panic");
+    } else if (ratio < 0.7) {
+      this.objects.circle.setTexture("ball/worry");
+    } else {
+      this.objects.circle.setTexture("ball/smile");
+    }
+  }
+
   checkLose() {
     for (let i = 0; i < this.objects.dots.length; i++) {
       for (let j = i + 2; j < this.objects.dots.length; j++) {
@@ -390,18 +404,21 @@ export default class InsideScene extends Phaser.Scene {
       }
     }
 
+    let dis = Math.min();
     for (let i = 0; i < this.objects.dots.length; i++) {
       let d = distance(
         this.objects.dots[i].getCenter(),
         this.objects.dots[(i + 1) % this.objects.dots.length].getCenter(),
         this.objects.circle.getCenter()
       );
+      dis = Math.min(dis, d);
       this.min_distance = Math.min(this.min_distance, d);
       if (d < this.level_data.radius) {
         this.endGame(false, "The circle touches the polygon.");
         return;
       }
     }
+    this.updateCircleImage(dis);
   }
 
   update(time: number, delta: number): void {
