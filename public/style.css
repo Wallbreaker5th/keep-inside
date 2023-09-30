@@ -15,6 +15,18 @@
   font: 20px Novem;
 }
 
+.options-button {
+  background-color: #2E6B5E; /* Green */
+  border: none;
+  color: white;
+  padding: 10px 10px;
+  margin: 10px 0px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font: 20px sans-serif;
+}
+
 body {
   background-color: #8be2ff;
   font: 20px Novem;

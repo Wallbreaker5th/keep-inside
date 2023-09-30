@@ -21,13 +21,25 @@ export function start_level(level) {
   game.scene.scenes[0].init_with_level_data(levels[level]);
 }
 
+let music = true;
+export function music_on_off() {
+  music = !music;
+  if (music) {
+    game.scene.scenes[0].bgm.on();
+  } else {
+    game.scene.scenes[0].bgm.off();
+  }
+  console.log("music", music);
+}
+
 for (let i = 0; i < levels.length; i++) {
-	// add into <div id="levels"></div>
   let button = document.createElement("button");
-	// div.innerHTML = `<button id="level${i}" class="levels-button" onclick="start_level(${i});">${i+1}</button>`;
   button.id = `level${i}`;
   button.className = "levels-button";
   button.onclick = () => start_level(i);
   button.innerHTML = (i+1).toString();
 	document.getElementById("levels").appendChild(button);
 }
+
+let button_music = document.getElementById("music");
+button_music.onclick = () => music_on_off();

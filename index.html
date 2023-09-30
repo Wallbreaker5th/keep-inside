@@ -4,7 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-		<link rel="preload" as="font" href="/Novem-gx193.ttf" type="font/ttf" crossorigin="anonymous">
+    <link
+      rel="preload"
+      as="font"
+      href="/Novem-gx193.ttf"
+      type="font/ttf"
+      crossorigin="anonymous"
+    />
     <title>Keep Inside</title>
   </head>
 
@@ -21,23 +27,32 @@
       <div style="width: 200px; margin: 10px">
         <div
           id="levels"
-          class="levels"
           style="
             display: flex;
             flex-direction: column;
             justify-content: space-between;
           "
         >
+          <div style="display: flex; justify-content: space-between">
+            <!-- buttons for options like music, etc. -->
+            <button
+              id="music"
+							class="options-button"
+              style="font-size: 20px; font-weight: bold; margin-bottom: 10px"
+            >
+              ♪ On/Off
+            </button>
+          </div>
           <span style="font-size: 20px; font-weight: bold; margin-bottom: 10px">
             Levels
           </span>
           <!-- buttons here -->
         </div>
       </div>
-      <script type="module" src="src/main.js"></script>
     </div>
-		<span>
-			By <a href="https://www.wallbreaker5th.top">WallBreaker5th</a>.
-		</span>
+    <span>
+      By <a href="https://www.wallbreaker5th.top">WallBreaker5th</a>.
+    </span>
+    <script type="module" src="src/main.js"></script>
   </body>
 </html>

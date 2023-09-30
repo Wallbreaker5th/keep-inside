@@ -2,9 +2,7 @@ import Phaser from "phaser";
 import { intersect, distance } from "./Geometry";
 import { colors } from "./Colors";
 import { settings } from "./Settings";
-import { levels } from "./Levels";
-
-let defualt_level_data = levels[0];
+import { BGM } from "./BGM";
 
 export default class InsideScene extends Phaser.Scene {
   objects: any;
@@ -31,6 +29,8 @@ export default class InsideScene extends Phaser.Scene {
   pointer_is_dragging: boolean = false;
   pointer_position: Phaser.Math.Vector2 = new Phaser.Math.Vector2(0, 0);
 
+  bgm: BGM = new BGM();
+
   constructor() {
     super("KeepInside");
   }
@@ -54,6 +54,9 @@ export default class InsideScene extends Phaser.Scene {
   }
 
   onPointerDown(pointer: Phaser.Input.Pointer) {
+    if (!this.level_data) {
+      return;
+    }
     if (!this.has_begun) {
       this.has_begun = true;
       this.is_running = true;
@@ -69,6 +72,9 @@ export default class InsideScene extends Phaser.Scene {
   }
 
   onPointerUp(pointer: Phaser.Input.Pointer) {
+    if (!this.level_data) {
+      return;
+    }
     if (!this.has_ended) {
       this.pointer_is_dragging = false;
       this.updatePointerLinks(pointer);
@@ -76,6 +82,9 @@ export default class InsideScene extends Phaser.Scene {
   }
 
   updatePointerLinks(pointer: Phaser.Input.Pointer) {
+    if (!this.level_data) {
+      return;
+    }
     if (this.has_ended) {
       return;
     }
@@ -193,6 +202,10 @@ export default class InsideScene extends Phaser.Scene {
       }
     }
 
+    if (this.level_data == null) {
+      this.bgm.status = BGM.GAME_1;
+      this.bgm.start();
+    }
     if (data != null) {
       this.level_data = data;
     }
@@ -217,6 +230,10 @@ export default class InsideScene extends Phaser.Scene {
     this.pointer_linking = -1;
     this.pointer_is_dragging = false;
     this.pointer_position = new Phaser.Math.Vector2(0, 0);
+    this.bgm.status = [BGM.GAME_1, BGM.GAME_2, BGM.GAME_3, BGM.GAME_4, BGM.GAME_5][
+      Math.floor(Math.random() * 5)
+    ];
+    console.log(this.bgm.status);
 
     let total_length = 0;
     this.time_points.push(0);
@@ -295,7 +312,19 @@ export default class InsideScene extends Phaser.Scene {
   }
 
   create() {
-    this.init_with_level_data(defualt_level_data);
+    this.objects = {};
+    this.objects.please_select = this.add.text(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2,
+      "Please select a level",
+      {
+        fontSize: "32pt",
+        color: "black",
+      }
+    );
+    this.objects.please_select.setOrigin(0.5, 0.5);
+
+    // this.init_with_level_data(null);
 
     this.input.on("pointerdown", this.onPointerDown, this);
     this.input.on("pointerup", this.onPointerUp, this);
