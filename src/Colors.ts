@@ -9,4 +9,6 @@ export const colors = {
   polygon_stroke: 0x000000,
   polygon_fill: 0x66ccff,
   polygon_dot: 0x000000,
+
+  link_stroke: 0x000000,
 };
