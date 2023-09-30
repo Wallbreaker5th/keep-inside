@@ -2,22 +2,9 @@ import Phaser from "phaser";
 import { intersect, distance } from "./Geometry";
 import { colors } from "./Colors";
 import { settings } from "./Settings";
+import { levels } from "./Levels";
 
-let defualt_level_data = {
-  polygon: [
-    [100, 100],
-    [100, 300],
-    [300, 300],
-    [300, 100],
-  ],
-  path: [
-    [200, 200],
-    [400, 200],
-    [500, 300],
-  ],
-  time: 5,
-  raius: 20,
-};
+let defualt_level_data = levels[0];
 
 export default class InsideScene extends Phaser.Scene {
   objects: any;
@@ -260,7 +247,7 @@ export default class InsideScene extends Phaser.Scene {
     this.objects.circle = this.add.circle(
       this.level_data.path[0][0],
       this.level_data.path[0][1],
-      this.level_data.raius,
+      this.level_data.radius,
       colors.circle_fill,
       1
     );
@@ -320,18 +307,20 @@ export default class InsideScene extends Phaser.Scene {
       {
         fontSize: "64pt",
         color: "#ffffff",
+        fontStyle: "bold",
       }
     );
     this.objects.text.setOrigin(0.5, 0.5);
 
     this.objects.text_end_info = this.add.text(
       this.cameras.main.width / 2,
-      this.cameras.main.height / 2 + 64,
+      this.cameras.main.height / 2 + 72,
       this.end_info + "\nClick to restart",
       {
         fontSize: "32pt",
         color: "#ffffff",
         align: "center",
+        fontStyle: "bold",
       }
     );
     this.objects.text_end_info.setOrigin(0.5, 0.5);
@@ -352,7 +341,7 @@ export default class InsideScene extends Phaser.Scene {
         this.endGame(
           true,
           "score: " +
-            Math.pow(this.min_distance - this.level_data.raius, 2).toFixed(2)
+            Math.pow(this.min_distance - this.level_data.radius, 2).toFixed(2)
         );
         break;
       } else {
@@ -388,7 +377,7 @@ export default class InsideScene extends Phaser.Scene {
         this.objects.circle.getCenter()
       );
       this.min_distance = Math.min(this.min_distance, d);
-      if (d < this.level_data.raius) {
+      if (d < this.level_data.radius) {
         this.endGame(false, "The circle is outside the polygon.");
         return;
       }
