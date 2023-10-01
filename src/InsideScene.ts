@@ -356,8 +356,6 @@ export default class InsideScene extends Phaser.Scene {
     );
     this.objects.please_select.setOrigin(0.5, 0.5);
 
-    // this.init_with_level_data(null);
-
     this.input.on("pointerdown", this.onPointerDown, this);
     this.input.on("pointerup", this.onPointerUp, this);
     this.input.on("pointermove", this.updatePointerLinks, this);

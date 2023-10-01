@@ -33,7 +33,6 @@ export function music_on_off() {
     game.scene.scenes[0].bgm.off();
     button_music.innerHTML = "♪ On/[Off]";
   }
-  console.log("music", music);
 }
 button_music.onclick = () => music_on_off();
 
