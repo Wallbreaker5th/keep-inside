@@ -133,7 +133,7 @@ let centered_levels = [
   },
 ];
 
-export let levels = centered_levels.map((level) => {
+export let levels = centered_levels.map((level,index) => {
   return {
     polygon: level.polygon.map((p) => {
       return [p[0] + settings.width / 2, p[1] + settings.height / 2];
@@ -144,5 +144,6 @@ export let levels = centered_levels.map((level) => {
     time: level.time,
     radius: level.radius,
     guide: level.guide,
+    index: index,
   };
 });

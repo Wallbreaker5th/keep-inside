@@ -21,16 +21,21 @@ export function start_level(level) {
   game.scene.scenes[0].init_with_level_data(levels[level]);
 }
 
+
+let button_music = document.getElementById("music");
 let music = true;
 export function music_on_off() {
   music = !music;
   if (music) {
     game.scene.scenes[0].bgm.on();
+    button_music.innerHTML = "♪ [On]/Off";
   } else {
     game.scene.scenes[0].bgm.off();
+    button_music.innerHTML = "♪ On/[Off]";
   }
   console.log("music", music);
 }
+button_music.onclick = () => music_on_off();
 
 for (let i = 0; i < levels.length; i++) {
   let button = document.createElement("button");
@@ -40,6 +45,3 @@ for (let i = 0; i < levels.length; i++) {
   button.innerHTML = (i+1).toString();
 	document.getElementById("levels").appendChild(button);
 }
-
-let button_music = document.getElementById("music");
-button_music.onclick = () => music_on_off();

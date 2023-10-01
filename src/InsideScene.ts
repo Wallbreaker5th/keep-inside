@@ -186,6 +186,7 @@ export default class InsideScene extends Phaser.Scene {
 
   preload() {
     this.load.image("guide", "guide.png");
+    this.load.image("background", "background.png");
     this.load.image("ball/smile", "ball/smile.png");
     this.load.image("ball/worry", "ball/worry.png");
     this.load.image("ball/panic", "ball/panic.png");
@@ -206,7 +207,6 @@ export default class InsideScene extends Phaser.Scene {
     }
 
     if (this.level_data == null) {
-      this.bgm.status = BGM.GAME_1;
       this.bgm.start();
     }
     if (data != null) {
@@ -233,10 +233,7 @@ export default class InsideScene extends Phaser.Scene {
     this.pointer_linking = -1;
     this.pointer_is_dragging = false;
     this.pointer_position = new Phaser.Math.Vector2(0, 0);
-    this.bgm.status = [BGM.GAME_1, BGM.GAME_2, BGM.GAME_3, BGM.GAME_4, BGM.GAME_5][
-      Math.floor(Math.random() * 5)
-    ];
-    console.log(this.bgm.status);
+    this.bgm.status = "BEFORE_START";
 
     let total_length = 0;
     this.time_points.push(0);
@@ -256,6 +253,13 @@ export default class InsideScene extends Phaser.Scene {
     this.updateCircleVelocity();
 
     this.objects = {};
+
+    this.objects.background = this.add.image(0, 0, "background");
+    this.objects.background.setOrigin(0, 0);
+    this.objects.background.setScale(
+      this.cameras.main.width / this.objects.background.width,
+      this.cameras.main.height / this.objects.background.height
+    );
 
     if (this.level_data.guide) {
       this.objects.guide = this.add.image(850, 400, "guide");
@@ -316,6 +320,14 @@ export default class InsideScene extends Phaser.Scene {
 
   create() {
     this.objects = {};
+
+    this.objects.background = this.add.image(0, 0, "background");
+    this.objects.background.setOrigin(0, 0);
+    this.objects.background.setScale(
+      this.cameras.main.width / this.objects.background.width,
+      this.cameras.main.height / this.objects.background.height
+    );
+
     this.objects.please_select = this.add.text(
       this.cameras.main.width / 2,
       this.cameras.main.height / 2,
@@ -378,6 +390,8 @@ export default class InsideScene extends Phaser.Scene {
       }
     );
     this.objects.text_end_info.setOrigin(0.5, 0.5);
+
+    this.bgm.status = this.is_win ? "END_WIN" : "END_LOSE";
   }
 
   updateCirclePosition(delta: number) {
@@ -405,14 +419,17 @@ export default class InsideScene extends Phaser.Scene {
     }
   }
 
-  updateCircleImage(distance: number) {
+  updateMood(distance: number) {
     let ratio = (distance - this.level_data.radius) / this.level_data.radius;
-    if (ratio < 0.3) {
+    if (ratio < 0.5) {
       this.objects.circle.setTexture("ball/panic");
-    } else if (ratio < 0.7) {
+      this.bgm.status = "GAME_PANIC";
+    } else if (ratio < 1.0) {
       this.objects.circle.setTexture("ball/worry");
+      this.bgm.status = "GAME_WORRY";
     } else {
       this.objects.circle.setTexture("ball/smile");
+      this.bgm.status = "GAME_SMILE";
     }
   }
 
@@ -447,7 +464,7 @@ export default class InsideScene extends Phaser.Scene {
         return;
       }
     }
-    this.updateCircleImage(dis);
+    this.updateMood(dis);
   }
 
   update(time: number, delta: number): void {
@@ -457,6 +474,9 @@ export default class InsideScene extends Phaser.Scene {
 
     delta /= 1000;
     this.updateCirclePosition(delta);
+    if (this.has_ended) {
+      return;
+    }
     this.drag(delta);
     this.checkLose();
   }

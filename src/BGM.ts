@@ -2,88 +2,38 @@ import * as Tone from "tone";
 
 export class BGM {
   // enumerate for different status
-  static readonly STOPPED = 0;
-  static readonly BEFORE_START = 10;
-  static readonly GAME_1 = 20;
-  static readonly GAME_2 = 21;
-  static readonly GAME_3 = 22;
-  static readonly GAME_4 = 23;
-  static readonly GAME_5 = 24;
-  static readonly GAME_WIN = 30;
-  static readonly GAME_LOSE = 31;
+  // STOPPED, BEFORE_START, GAME_SMILE, GAME_WORRY, GAME_PANIC, END_WIN, END_LOSE
 
   static readonly volume = -10;
 
-  status = BGM.STOPPED;
+  private _status = "STOPPED";
 
-  readonly sequences = {
-    GAME_1: {
-      notes: [
-        { note: "C4", duration: "8n", offset: "+0" },
-        { note: "E4", duration: "8n", offset: "+0:0:0.01" },
-        { note: "G4", duration: "16n", offset: "+0:1:0" },
-        { note: "E4", duration: "16n", offset: "+0:1:2" },
-        { note: "B4", duration: "8n", offset: "+0:2:0" },
-      ],
-      duration: "+0:3:0",
-      bpm: 250,
-    },
-    GAME_2: {
-      notes: [
-        { note: "G4", duration: "8n", offset: "+0" },
-        { note: "B4", duration: "8n", offset: "+0:0:0.01" },
-        { note: "E4", duration: "16n", offset: "+0:1:0" },
-        { note: "C5", duration: "16n", offset: "+0:1:2" },
-        { note: "F4", duration: "8n", offset: "+0:2:0" },
-      ],
-      duration: "+0:3:0",
-      bpm: 270,
-    },
-    GAME_3: {
-      notes: [
-        { note: "F#4", duration: "16n", offset: "+0" },
-        { note: "A#4", duration: "16n", offset: "+0:0:0.01" },
-        { note: "F#4", duration: "16n", offset: "+0:0:2" },
-        { note: "C4", duration: "16n", offset: "+0:1:0" },
-        { note: "Eb4", duration: "16n", offset: "+0:1:2" },
-        { note: "C4", duration: "16n", offset: "+0:2:0" },
-        { note: "Eb4", duration: "16n", offset: "+0:2:2" },
-      ],
-      duration: "+0:3:0",
-      bpm: 300,
-    },
-    GAME_4: {
-      notes: [
-        { note: "C4", duration: "16n", offset: "+0" },
-        { note: "E4", duration: "16n", offset: "+0:0:0.01" },
-        { note: "E4", duration: "16n", offset: "+0:0:2" },
-        { note: "F#4", duration: "16n", offset: "+0:1:0" },
-      ],
-      duration: "+0:1:2",
-      bpm: 300,
-    },
-    GAME_5: {
-      notes: [
-        { note: "Db4", duration: "16n", offset: "+0" },
-        { note: "Fb4", duration: "16n", offset: "+0:0:0.01" },
-        { note: "D4", duration: "16n", offset: "+0:0:2" },
-        { note: "Eb4", duration: "16n", offset: "+0:1:0" },
-      ],
-      duration: "+0:1:2",
-      bpm: 300,
-    },
+  readonly short_files = {
+    GAME_SMILE: new Tone.Player("/bgm/smile.wav").toDestination(),
+    GAME_WORRY: new Tone.Player("/bgm/worry.wav").toDestination(),
+    GAME_PANIC: new Tone.Player("/bgm/panic.wav").toDestination(),
+  };
+  readonly win_and_lose_files = {
+    END_WIN: new Tone.Player("/bgm/win.wav").toDestination(),
+    END_LOSE: new Tone.Player("/bgm/lose.wav").toDestination(),
   };
 
-  readonly synth = new Tone.Synth().toDestination();
+  get status() {
+    return this._status;
+  }
 
-  chooseSequence(): {
-    notes: { note: string; duration: string; offset: string }[];
-    duration: string;
-  } {
-    if (this.status >= BGM.GAME_1 && this.status <= BGM.GAME_5) {
-      return this.sequences[`GAME_${this.status - BGM.GAME_1 + 1}`];
+  set status(value: string) {
+    this._status = value;
+  }
+
+  choose() {
+    if (this.status in this.short_files) {
+      return this.short_files[this.status];
+    } else if(this.status in this.win_and_lose_files) {
+      return this.win_and_lose_files[this.status];
+    } else {
+      return null;
     }
-    return { notes: [], duration: "+0:0:1" };
   }
 
   off() {
@@ -94,29 +44,22 @@ export class BGM {
     Tone.Destination.volume.value = BGM.volume;
   }
 
-  // play a sequence of notes
-  playSequence(sequence: {
-    notes: { note: string; duration: string; offset: string }[];
-    duration: string;
-  }) {
-    for (let note of sequence.notes) {
-      if (Math.random() < 0.2) {
-        // choose another note in the sequence
-        let index = Math.floor(Math.random() * sequence.notes.length);
-        this.synth.triggerAttackRelease(
-          sequence.notes[index].note,
-          note.duration,
-          note.offset
-        );
-      } else {
-        this.synth.triggerAttackRelease(note.note, note.duration, note.offset);
-      }
+  play(player: Tone.Player | null) {
+    if (player === null) {
+      setTimeout(() => {
+        this.play(this.choose());
+      }, 200);
+    } else {
+      let now = Tone.now();
+      let current_status = this.status;
+      player.start();
+      setTimeout(() => {
+        if(this.status in this.win_and_lose_files && this.status == current_status) {
+          this.status = "STOPPED";
+        }
+        this.play(this.choose());
+      }, player.buffer.duration * 1000);
     }
-    console.log("t1",sequence.duration);
-    Tone.Transport.scheduleOnce(() => {
-      this.playSequence(this.chooseSequence());
-      console.log("t2");
-    }, sequence.duration);
   }
 
   async start() {
@@ -124,6 +67,8 @@ export class BGM {
     Tone.Transport.start();
     this.on();
 
-    this.playSequence(this.chooseSequence());
+    Tone.loaded().then(() => {
+      this.play(this.choose());
+    });
   }
 }
