@@ -121,12 +121,29 @@ export default class InsideScene extends Phaser.Scene {
         this.objects.link.setLineWidth(1);
       }
     } else {
-      this.objects.link.setTo(
-        this.objects.dots[this.pointer_linking].x,
-        this.objects.dots[this.pointer_linking].y,
+      let dot = this.objects.dots[this.pointer_linking];
+      let dist = Phaser.Math.Distance.Between(
+        dot.x,
+        dot.y,
         pointer.x,
         pointer.y
       );
+      if (dist < settings.max_speed / settings.speed_factor) {
+        this.objects.link.setTo(dot.x, dot.y, pointer.x, pointer.y);
+      } else {
+        let drag_vector = new Phaser.Math.Vector2(
+          pointer.x - dot.x,
+          pointer.y - dot.y
+        )
+          .normalize()
+          .scale(settings.max_speed / settings.speed_factor);
+        this.objects.link.setTo(
+          dot.x,
+          dot.y,
+          dot.x + drag_vector.x,
+          dot.y + drag_vector.y
+        );
+      }
       this.objects.link.setLineWidth(2);
     }
   }
